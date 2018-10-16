@@ -70,7 +70,12 @@ Support user-defined functions like sum or product that take a variable number o
             $values(1) + sum($values(2 to array:size($values)))
     };
 
-## Grammar
+## Grammar (Preliminary; Unverified)
+
+__Modified (Integration Points):__
 
     ParamList ::= Param ("," Param)* ("," VariadicParam)?
+
+__New:__
+
     VariadicParam ::= "$" EQName "as" "variadic" ArrayTest
