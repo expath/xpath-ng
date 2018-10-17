@@ -34,7 +34,11 @@ There are many languages that have support for variadic function arguments, incl
 
 Define the `fn:concat` function in the XPath and XQuery Functions and Operators 3.1 specification using valid XPath/XQuery syntax, instead of hand-waiving the variadic nature of the function.
 
-Support other vendor-specific functions that allow variadic arguments.
+Support other vendor-specific functions that allow variadic arguments. These include:
+
+1. [out:format](http://docs.basex.org/wiki/Output_Module#out:format) -- BaseX
+1. [xdmp:apply](https://docs.marklogic.com/xdmp:apply) -- MarkLogic
+1. [sem:coalesce](https://docs.marklogic.com/sem:coalesce) -- MarkLogic
 
 Support user-defined functions like sum or product that take a variable number of arguments without requiring nested parenthesis (e.g. using `sum(1, 2, 3)` instead of `sum((1, 2, 3))`).
 
@@ -52,6 +56,8 @@ Support user-defined functions like sum or product that take a variable number o
 
 1. MUST allow access to the variadic arguments within the function body of an XPath/XQuery expression or function declaration.
 
+1. MAY allow variadic arguments to be applied to annotation definitions.
+
 ## Examples
 
 ### fn:concat
@@ -68,9 +74,36 @@ Support user-defined functions like sum or product that take a variable number o
 
 ### sum
 
+Using a function declaration (XQuery):
+
     declare function sum($values as variadic array(xs:numeric)) {
         array:fold-left($values, 0, function ($a, $b) { $a + $b })
     };
+
+    sum(1, 2, 3)
+
+Using inline function expressions (XPath/XQuery):
+
+    let $sum := function ($values as variadic array(xs:numeric)) {
+        array:fold-left($values, 0, function ($a, $b) { $a + $b })
+    };
+    return $sum(1, 2, 3)
+
+### rest:form-params (EXQuery RESTXQ)
+
+    declare %annotation function rest:form-param(
+        $name as xs:string,
+        $param-reference as xs:string,
+        $default-values as variadic array(xs:string)
+    ) external;
+
+or with support for annotation declarations:
+
+    declare annotation rest:form-param(
+        $name as xs:string,
+        $param-reference as xs:string,
+        $default-values as variadic array(xs:string)
+    ) for function;
 
 ## Grammar (Preliminary; Unverified)
 
