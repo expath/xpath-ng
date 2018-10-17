@@ -17,7 +17,7 @@ If the function reference specifies an arity equal to one more than the number o
 
 When a function with variadic arguments is called, the arguments after the argument that corresponds with the last non-variadic parameter are collected into an array in the same order and passed to the variadic parameter.
 
-A function with a variadic argument may be passed an array or sequence to that argument. If it is passed a sequence, the sequence is treated as if it was wrapped in an array constructor.
+If any of these arguments are an array or sequence, that array or sequence will be included as is at the place in the variadic array it occurs in the argument list from the variadic parameter. For example, if the variadic parameter is the third parameter in a function definition, and an array is passed as the fourth parameter, that array will be the second argument of the variadic array passed to the declared function.
 
 ### Influences
 
@@ -46,8 +46,6 @@ Support user-defined functions like sum or product that take a variable number o
 
 1. MUST allow access to the variadic arguments within the function body of an XPath/XQuery expression or function declaration.
 
-1. MAY allow passing arrays or sequences as the variadic parameter instead of passing separate arguments.
-
 ## Examples
 
 ### fn:concat
@@ -64,10 +62,7 @@ Support user-defined functions like sum or product that take a variable number o
 ### sum
 
     declare function sum($values as variadic array(xs:numeric)) {
-        if (array:size($values) = 1) then
-            $values
-        else
-            $values(1) + sum($values(2 to array:size($values)))
+        array:fold-left($values, 0, function ($a, $b) { $a + $b })
     };
 
 ## Grammar (Preliminary; Unverified)
