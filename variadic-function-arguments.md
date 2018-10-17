@@ -7,13 +7,19 @@ Allow support for a variable-length sequence of typed parameters to a function.
 
 ## Description
 
-A variadic function parameter has at least 1 item. The upper bound is unbounded, but may be an implementation defined limit.
+Variadic function parameters are defined using an `ArrayTest`. For example:
 
-For a function with `N` non-variadic parameters and a variadic parameter, that function defines a set of functions in the static context with the specified function name, and arity of `N+1` upward to the maximum number of arguments supported by an implementation.
+    $mimetypes as variadic array(xs:string)
+
+In this example, `$mimetypes` is a *variadic function parameter*. A variadic function parameter must be the last parameter of a function defined by an inline function expression or function declaration.
+
+The *variadic parameter type* is the type of the `ArrayTest` associated with the variadic function parameter, or `item()` if it is not specified.
+
+A function definition where the last parameter is a variadic function parameter has a minimum arity equal to the number of non-variadic parameters, and an unbounded maximum arity.
 
 A function reference to a variadic function will behave the same as if the function was defined with the specified arity, or an error if there are fewer arguments than the requested arity.
 
-If the function reference specifies an arity equal to one more than the number of non-variadic arguments (i.e. where the variadic size is 1), the last argument is treated as having a type equal to the union of the specified type and an array of the specified type.
+If a named function reference is created with an arity equal to the number of parameters including the variadic function parameter, the type of the last parameter in the bound function is the variadic parameter type.
 
 When a function with variadic arguments is called, the arguments after the argument that corresponds with the last non-variadic parameter are collected into an array in the same order and passed to the variadic parameter.
 
@@ -52,12 +58,13 @@ Support user-defined functions like sum or product that take a variable number o
 
     declare function fn:concat(
         $arg1 as xs:anyAtomicType?,
-        $args as variadic array(xs:anyAtomicType?)
+        $arg2 as xs:anyAtomicType?,
+        $other-args as variadic array(xs:anyAtomicType?)
     ) external;
 
     let $f := fn:concat#4
-    let $g := fn:concat#1 (: error: fn:concat requires at least 2 arguments :)
-    return $f(1, 2, 3, 4) (: returns "1234" :)
+    let $g := fn:concat#2
+    return ($f(1, 2, 3, 4), $g("a", "b")) (: returns ("1234", "ab") :)
 
 ### sum
 
