@@ -38,9 +38,6 @@ Here we categorise, list and link to each syntax extension that has been propose
 
 Any proposals are XQuery specific, should be clearly marked as such with: "(**XQuery only**)"
 
-Name | Contributor | Notes
---- | --- | ---
-[Ternary If](ternary-if-ChristianGruen.md) | Christian Grün, BaseX GmbH | XPath & XQuery
-[If Without Else](if-without-else-ChristianGruen.md) | Christian Grün, BaseX GmbH | XPath & XQuery
+
+1. **TODO** link proposals here.
  
-Everyone: Please add and link further proposals.
