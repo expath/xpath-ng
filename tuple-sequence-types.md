@@ -42,24 +42,20 @@ The following draft text is added before the table in this section of the XPath/
 
 ### Influences
 
-Various other languages such as Python, Scala, C#, and C++ have support for tuple types.
+Various other languages such as Python, Scala, C#, and C++ have support for tuple types that have a fixed number of items. They allow the type of each item to be specified such that they can be different types.
 
 The syntax for this is the syntax that MarkLogic use to describe the MarkLogic [math:modf](https://docs.marklogic.com/math:modf) function. There, the return type of that function is given as:
 
-> as (xs:double,xs:integer)
+> as (xs:double, xs:integer)
 
-There is support for tuple-like constructs with the [Type](https://www.w3.org/TR/xquery-semantics/#doc-fs-Type) grammar in XQuery 1.0 and XPath 2.0 Formal Semantics (Second Edition). The difference is that the `Type` syntax allows for mixing tuple, union, and intersection without operator precedence or how to evaluate mixed types.
+There is support for tuple-like constructs with the [Type](https://www.w3.org/TR/xquery-semantics/#doc-fs-Type) grammar in XQuery 1.0 and XPath 2.0 Formal Semantics (Second Edition). The difference is that the `Type` syntax allows for mixing tuple, union, and intersection without operator precedence or how to evaluate mixed types. The formal methods Type or similar syntax is implemented in the following XPath/XQuery processors:
 
+1. XQuantum XQuery 1.0 -- http://www.cogneticsystems.com/xquery/alignment.html#reg
+1. Galax 1.0 -- http://galax.sourceforge.net/doc/alignment.html#toc19
 
 ## Use Cases
 
 This allows better static type checking of these fixed-length sequence types.
-
-This interacts with the `ParenthesizedItemType` syntax, so could cause confusion there when implementing XQuery. There is no ambiguity in the grammar, provided they are ordered such that `ParenthesizedItemType` takes precedence when parsing a single type in parenthesis.
-
-I have kept these separate in the grammar for consistency with the existing XQuery type model, especially regarding section 2.5.5.2 Matching an ItemType and an Item:
-
-> A ParenthesizedItemType matches an item if and only if the item matches the ItemType that is in parentheses.
 
 
 ## Examples
@@ -100,12 +96,6 @@ __New:__
     TupleSequenceType ::= "(" ItemType ("," ItemType)* ")"
 
 __NOTE:__ This allows other sequence-based types to be added to the `ParenthesizedSequenceType` EBNF symbol.
-
-## Implementation Experience
-
-1. [XQuery IntelliJ Plugin](https://github.com/rhdunn/xquery-intellij-plugin) -- hand-written recursive-descent parser only for the above syntax, with the fallback to `ParenthesizedItemType` for a single `ItemType` in parenthesis; no type checking.
-1. XQuantum XQuery 1.0 -- http://www.cogneticsystems.com/xquery/alignment.html#reg
-1. Galax 1.0 -- http://galax.sourceforge.net/doc/alignment.html#toc19, using the XQuery Formal Semantics syntax
 
 ## Related Proposals
 
