@@ -1,8 +1,8 @@
-# Restricted Sequence Type
+# Restricted Sequences
 
 **Author**: Reece H. Dunn. 67 Bricks.
 
-Define a sequence with a fixed number of items and explicit types for each element.
+Limit a sequence to a fixed number of items with explicit types for each element.
 
 
 ## Description
@@ -13,7 +13,7 @@ Define a sequence with a fixed number of items and explicit types for each eleme
 >
 > A 2D point could be defined as:
 >
->     declare type point2D = ( xs:double, xs:double );
+>     declare type point2D = sequence-of( xs:double, xs:double );
 >
 > Here, the first value is the x coordinate and the second value is the y coordinate.
 
@@ -25,7 +25,9 @@ A restricted sequence type may specify different types for the items in the sequ
 
 > Example:
 >
->     declare function find-at($items, $value) as (item(), xs:integer)? external;
+>     declare function find-at(
+>         $items, $value
+>     ) as sequence-of( item(), xs:integer )? external;
 
 If a restricted sequence is assigned a flattened sequence that contains a different number of items than is specified by the restricted sequence type, a type error is raised.
 
@@ -40,9 +42,9 @@ An XQuery processor may infer a restricted sequence type from an untyped sequenc
 
 The following draft text is added before the table in this section of the XPath/XQuery specification.
 
-1. `B` is a restricted sequence type `(Bi_1, Bi_2, ..., Bi_N)`, `A` is a restricted sequence type `(Ai_1, Ai_2, ..., Ai_M)`, where `N` equals `M`; for values of `I` between `1` and `N`, `subtype(Bi_I, Ai_I)`.
-1. `B` is `Bi*` or `Bi+`, `A` is a restricted sequence type `(Ai_1, Ai_2, ..., Ai_N)`; for values of `I` between `1` and `N`, `subtype(Bi, Ai_I)`.
-1. `B` is a restricted sequence type `(Bi_1, Bi_2, ..., Bi_N)`, `A` is `Ai*` or `Ai+`; for values of `I` between `1` and `N`, `subtype(Bi_I, Ai)`.
+1. `B` is a restricted sequence `sequence-of(Bi_1, Bi_2, ..., Bi_N)`, `A` is a restricted sequence `sequence-of(Ai_1, Ai_2, ..., Ai_M)`, where `N` equals `M`; for values of `I` between `1` and `N`, `subtype(Bi_I, Ai_I)`.
+1. `B` is `Bi*` or `Bi+`, `A` is a restricted sequence `sequence-of(Ai_1, Ai_2, ..., Ai_N)`; for values of `I` between `1` and `N`, `subtype(Bi, Ai_I)`.
+1. `B` is a restricted sequence `sequence-of(Bi_1, Bi_2, ..., Bi_N)`, `A` is `Ai*` or `Ai+`; for values of `I` between `1` and `N`, `subtype(Bi_I, Ai)`.
 1. The result of the `subtype(A, B)` judgement can be determined from the table below, which makes use of the auxiliary judgement `subtype-itemtype(Ai, Bi)` defined in __2.5.6.2 The judgement `subtype-itemtype(Ai, Bi)`__. 
 
 
@@ -59,34 +61,40 @@ This is used in the MarkLogic definition of the vendor-specific [math:modf](http
 
 > as (xs:double, xs:integer)
 
+Due to incompatibilities with the XQuery 3.0 `ParenthesizedItemType` a different syntax is used in this proposal, based on a suggestion by Michael Kay.
+
 ## Use Cases
 
-This allows better static type checking of these fixed-length sequence types.
+This allows better static type checking of fixed-length sequences.
 
 
 ## Examples
 
 Calculating sin and cos at the same time:
 
-    declare function sincos($angle as xs:double?) as (xs:double, xs:double)? {
+    declare function sincos(
+        $angle as xs:double?
+    ) as sequence-of(xs:double, xs:double)? {
         (: could use a sincos assembly instruction :)
         math:sin($angle), math:cos($angle)
     };
 
 Complex number conversion:
 
-    declare function polar-to-cartesian($polar as (xs:double, xs:double)) as (xs:double, xs:double) {
+    declare function polar-to-cartesian(
+        $polar as sequence-of(xs:double, xs:double)
+    ) as sequence-of(xs:double, xs:double) {
         $polar[1] * math:cos($polar[2]),
         $polar[1] * math:sin($polar[2])
     };
 
 Defining a rational number type (using the Saxon 9.8 type declaration syntax):
 
-    declare type rational = ( xs:integer, xs:integer );
+    declare type rational = sequence-of( xs:integer, xs:integer );
 
 Using the MarkLogic modf function:
 
-    let $ret as (xs:double, xs:integer) := math:modf(1.25)
+    let $ret as sequence-of(xs:double, xs:integer) := math:modf(1.25)
     return $ret[2] (: returns: 1 :)
 
 
@@ -94,14 +102,13 @@ Using the MarkLogic modf function:
 
 __Modified (Integration Points):__
 
-    ItemType ::= KindTest | ("item" "(" ")") | FunctionTest | MapTest | ArrayTest | AtomicOrUnionType | ParenthesizedSequenceType
+    SequenceType ::= ("empty-sequence" "(" ")")
+                     | (ItemType OccurrenceIndicator?)
+                     | (SequenceOfTest "?"?)           /* new */
 
 __New:__
 
-    ParenthesizedSequenceType ::= ParenthesizedItemType | TupleSequenceType
-    TupleSequenceType ::= "(" ItemType ("," ItemType)* ")"
-
-__NOTE:__ This allows other sequence-based types to be added to the `ParenthesizedSequenceType` EBNF symbol.
+    SequenceOfTest ::= "sequence-of" "(" ItemType (","  ItemType)* ")"
 
 ## Related Proposals
 
