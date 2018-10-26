@@ -2,6 +2,8 @@
 
 **Author**: Reece H. Dunn. 67 Bricks.
 
+**Revision**: 3
+
 Limit a sequence to a fixed number of items with explicit types for each element.
 
 
@@ -40,12 +42,34 @@ An XQuery processor may infer a restricted sequence type from an untyped sequenc
 
 ### The judgement subtype(A, B)
 
-The following draft text is added before the table in this section of the XPath/XQuery specification.
+\[Definition: The *cardinality* of a sequence is a possibly infinite set of non-negative integers.\] This constrains the number of items in a sequence.
 
-1. `B` is a restricted sequence `sequence-of(Bi_1, Bi_2, ..., Bi_N)`, `A` is a restricted sequence `sequence-of(Ai_1, Ai_2, ..., Ai_M)`, where `N` equals `M`; for values of `I` between `1` and `N`, `subtype(Bi_I, Ai_I)`.
-1. `B` is `Bi*` or `Bi+`, `A` is a restricted sequence `sequence-of(Ai_1, Ai_2, ..., Ai_N)`; for values of `I` between `1` and `N`, `subtype(Bi, Ai_I)`.
-1. `B` is a restricted sequence `sequence-of(Bi_1, Bi_2, ..., Bi_N)`, `A` is `Ai*` or `Ai+`; for values of `I` between `1` and `N`, `subtype(Bi_I, Ai)`.
-1. The result of the `subtype(A, B)` judgement can be determined from the table below, which makes use of the auxiliary judgement `subtype-itemtype(Ai, Bi)` defined in __2.5.6.2 The judgement `subtype-itemtype(Ai, Bi)`__. 
+\[Definition: The *required item type list* of a restricted sequence subtype is the specified `ItemType`s of each item in the restricted sequence.\] If the sequence type is not a restricted sequence, each type in the *required item type list* is the same as the *item type* of the sequence type.
+
+The *cardinality* and *item type* of a sequence are given as follows:
+
+| Type                 | Cardinality     | Item Type         | Description                          |
+|----------------------|-----------------|-------------------|--------------------------------------|
+| `xs:error`           | `{}`            | *missing*         | An XSD error type.                   |
+| `xs:error?`          | `{0}`           | *missing*         | An optional XSD error type.          |
+| `xs:error+`          | `{}`            | *missing*         | An XSD error type sequence.          |
+| `xs:error*`          | `{0}`           | *missing*         | An optional XSD error type sequence. |
+| `empty-sequence()`   | `{0}`           | *missing*         | An empty sequence `()`.              |
+| `T?`                 | `{0,1}`         | `T`               | An optional item.                    |
+| `T`                  | `{1}`           | `T`               | A single item.                       |
+| `T*`                 | `{0..infinity}` | `T`               | An optional sequence.                |
+| `T+`                 | `{1..infinity}` | `T`               | A sequence.                          |
+| `(T1, T2, ..., Tn)?` | `{0..n}`        | `item()`          | An optional restricted sequence.     |
+| `(T1, T2, ..., Tn)`  | `{1..n}`        | `item()`          | A restricted sequence.               |
+
+> Proposal Note:
+>
+> The rules for `xs:error?`, `xs:error+`, and `xs:error*` here are for compatibility with the XPath/XQuery 3.1 rules for those sequence types.
+
+The `subtype(A,B)` judgement is true if and only if both of the following are true:
+
+1.  The permitted cardinality of `A` is a subset of the permitted cardinality of `B`.
+1.  Let `Ai` be the required item type of item `i` in `A` and let `Bi` be the required item type of `i` in `B`; for all `i` in the permitted cardinality of `A`, `itemtype-subtype(Ai, Bi)` is true.
 
 
 ### Influences
@@ -62,6 +86,7 @@ This is used in the MarkLogic definition of the vendor-specific [math:modf](http
 > as (xs:double, xs:integer)
 
 Due to incompatibilities with the XQuery 3.0 `ParenthesizedItemType` a different syntax is used in this proposal, based on a suggestion by Michael Kay.
+
 
 ## Use Cases
 
@@ -110,6 +135,14 @@ __New:__
 
     SequenceOfTest ::= "sequence-of" "(" ItemType (","  ItemType)* ")"
 
+
 ## Related Proposals
 
 1.  Sequence Decomposition -- Extracting the values from a sequence into separate variables in a single for/let/etc. clause.
+
+
+## Version History
+
+1.  Initial proposal.
+1.  Revised the *tuple sequence type* terminology as *restricted sequences*, and updated the syntax to avoid parse conflicts with `ParenthesizedItemType`.
+1.  Updated the `subtype` judgement semantics using a combination of a proposal by Michael Kay and static analysis rules for the XQuery IntelliJ plugin.
