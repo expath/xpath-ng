@@ -9,7 +9,7 @@ Limit a sequence to a fixed number of items with explicit types for each element
 
 ## Description
 
-\[Definition: A *restricted sequence type* is a sequence type that is limited to containing a fixed number of items.\] This restriction places constraints on a sequence type like specifying the type and cardinality of a sequence, it does not define a new type.
+\[Definition: A *restricted sequence type* is a sequence type that is limited to containing a fixed number of items.\] This restriction places constraints on a sequence type like specifying the type and cardinality of a sequence. It does not define a new distinct type, but instead defines a subtype of a sequence type.
 
 > Example:
 >
@@ -23,21 +23,13 @@ Limit a sequence to a fixed number of items with explicit types for each element
 >
 > A restricted sequence must have more than one value. If a type in parenthesis only specifies a single item, it is a parenthesized item type.
 
-A restricted sequence type may specify different types for the items in the sequence.
+A restricted sequence type may specify different types for the items in the sequence. Additionally, the restricted sequence may be made optional by using the `?` occurrence relation.
 
 > Example:
 >
 >     declare function find-at(
 >         $items, $value
 >     ) as sequence-of( item(), xs:integer )? external;
-
-If a restricted sequence is assigned a flattened sequence that contains a different number of items than is specified by the restricted sequence type, a type error is raised.
-
-If an item in the flattened sequence being assigned to a restricted sequence type is not convertible to the corresponding type at the same position, a type error is raised.
-
-If the types of two restricted sequence types are not compatible (see the judgement `subtype(A, B)` definition below) a type error is raised.
-
-An XQuery processor may infer a restricted sequence type from an untyped sequence during the static analysis phase.
 
 
 ### The judgement subtype(A, B)
@@ -88,10 +80,9 @@ This is used in the MarkLogic definition of the vendor-specific [math:modf](http
 Due to incompatibilities with the XQuery 3.0 `ParenthesizedItemType` a different syntax is used in this proposal, based on a suggestion by Michael Kay.
 
 
-## Use Cases
+## Rationale
 
-This allows better static type checking of fixed-length sequences.
-
+The proposal allows the type of a sequence to be further constrained. This (a) makes code more understandable by documenting the interface between functions; (b) enables improved diagnostics as a result of more precise type checking of function arguments and function results; and (c) enables processors (if they wish) to perform more precise static type checking and to use the extra information for optimization.
 
 ## Examples
 
@@ -145,4 +136,4 @@ __New:__
 
 1.  Initial proposal.
 1.  Revised the *tuple sequence type* terminology as *restricted sequences*, and updated the syntax to avoid parse conflicts with `ParenthesizedItemType`.
-1.  Updated the `subtype` judgement semantics using a combination of a proposal by Michael Kay and static analysis rules for the XQuery IntelliJ plugin.
+1.  Updated the `subtype` judgement semantics using a combination of a proposed wording by Michael Kay and static analysis rules for the XQuery IntelliJ plugin. The rationale text wording has been written by Michael Kay.
