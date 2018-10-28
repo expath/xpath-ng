@@ -1,19 +1,15 @@
-# Tuple Decomposition
+# Sequence and Array Decomposition
 
 **Author**: Reece H. Dunn. 67 Bricks.
 
-This proposal allows fixed length sequences and arrays to be decomposed and assigned to separate variables in a single declaration.
+**Revision**: 2
+
+This proposal allows sequences and arrays to be decomposed and assigned to separate variables in a single declaration.
 
 
 ## Description
 
-\[Definition: A *tuple sequence* is a fixed length sequence, where the items in the array represent distinct parts of an object, not an ordered collection of objects.\] For example, a 2D point could be represented as a tuple sequence, where the first value will be the x coordinate and the second value the y coordinate.
-
-\[Definition: A *tuple array* is a fixed length array, where the items in the array represent distinct parts of an object, not an ordered collection of objects.] The 2D point example could also be represented as an array with 2 values. An array can also be used for objects that contain optional items.
-
-\[Definition: A *tuple* is a tuple sequence or tuple array.\]
-
-Given a tuple such as `(1, 2, 3)`, the values within that sequence or array cannot easily be extracted. With the current version of XPath and XQuery, they need to be assigned to a temporary variable first. For example:
+Given a sequence such as `(1, 2, 3)`, the values within that sequence or array cannot easily be extracted. With the current version of XPath and XQuery, they need to be assigned to a temporary variable first. For example:
 
     let $result := get-camera-point()
     let $x := $result[1]
@@ -28,9 +24,9 @@ This proposal would allow this to be written more concisely as:
 
 An XPath or XQuery processor may implement this by transforming it to the expanded form above with `$result` being a unique variable that is not visible to the expression.
 
-For tuple sequences, `$tuple[N]` would be used to extract the nth item in the tuple sequence. If the item does not exist, an empty sequence is returned.
+For sequences, `$seq[N]` would be used to extract the nth item in the sequence. If the item does not exist, an empty sequence is returned.
 
-For tuple arrays, `$tuple(N)` or `array:get($tuple, N)` would be used to extract the nth item in the tuple array. If the item does not exist, an `err:FOAY0001` (array index out of bounds) error will be raised.
+For arrays, `$array(N)` or `array:get($array, N)` would be used to extract the nth item in the array. If the item does not exist, an `err:FOAY0001` (array index out of bounds) error will be raised.
 
 This would apply to any variable declaration or binding where `:=` is used to assign a variable to an expression. Specifically:
 
@@ -42,18 +38,18 @@ This would apply to any variable declaration or binding where `:=` is used to as
 
 ### Variation: Separate Tuple Array Decomposition Syntax
 
-If the tuple decomposition is being performed on a tuple array, it may be better to use array syntax to define the composition:
+If the decomposition is being performed on an array, it may be better to use array syntax to define the composition:
 
     let [$x, $y, $z] := get-camera-point()
     return "(" || $x || "," || $y || "," || $z || ")"
 
-The `(...)` syntax would then be *tuple sequence decomposition*, while the `[...]` syntax would be *tuple array decomposition*.
+The `(...)` syntax would then be *sequence decomposition*, while the `[...]` syntax would be *array decomposition*.
 
-This would allow XPath/XQuery processors to report an error if tuple sequence decomposition was used on tuple arrays, and when tuple array decomposition was used on tuple sequences.
+This would allow XPath/XQuery processors to report an error if sequence decomposition was used on arrays, and when array decomposition was used on sequences.
 
 This would make it clearer to the user when a sequence is expected and when an array is expected, and thus when out of bounds access would result in an empty sequence or an error.
 
-This does add an additional level of complexity to the language grammar, but may help processors decide how to decompose the tuple values as determining whether the tuple type being decomposed is a sequence or array can be determined during the static analysis phase.
+This does add an additional level of complexity to the language grammar, but may help processors decide how to decompose the values as determining whether the type being decomposed is a sequence or array can be determined during the static analysis phase.
 
 ### Assigning the rest of a sequence or array
 
@@ -75,11 +71,11 @@ Python has support for specifying that a variable is assigned the remaining valu
 
 ## Use Cases
 
-There are many cases where fixed size sequences (*tuple sequences*) may be used such as points, complex and rational numbers, sin/cos, and mul/div. This makes extracting data from these simpler, and may also be used to aid readability by assigning descriptive names to each of the tuple items.
+There are many cases where fixed size sequences may be used such as points, complex and rational numbers, sin/cos, and mul/div. This makes extracting data from these simpler, and may also be used to aid readability by assigning descriptive names to each of the items in the sequence.
 
 ### Potential Confusion and Complexity
 
-From a user's perspective it would be confusing if an item in the sequence is an empty sequence, as the items after that would be assigned to the wrong variable. However, this is no different from them using the long form to extract the values from the tuple sequence.
+From a user's perspective it would be confusing if an item in the sequence is an empty sequence, as the items after that would be assigned to the wrong variable. However, this is no different from them using the long form to extract the values from the sequence.
 
 There is a potential for confusion if changing from a sequence return type to an array, where the code may subsequently raise an `err:FOAY0001` error. The reason for this is hidden from the user.
 
@@ -88,7 +84,7 @@ There is complexity for the semantics of variable declarations, especially those
 
 ## Examples
 
-Extracting values from a tuple sequence:
+Extracting values from a sequence:
 
     declare function sincos($angle as xs:double?) {
         math:sin($angle), math:cos($angle)
@@ -98,7 +94,7 @@ Extracting values from a tuple sequence:
     let ($sin, $cos) := sincos($angle)
     return $sin || "," || $cos
 
-Extracting values from a tuple array:
+Extracting values from an array:
 
     declare function sincos($angle as xs:double?) {
         [ math:sin($angle), math:cos($angle) ]
@@ -117,3 +113,9 @@ Extracting values with typed variables:
 ## Grammar
 
 TBD.
+
+
+## Version History
+
+1.  Initial proposal.
+1.  Remove references to tuples, except for the influences section.
