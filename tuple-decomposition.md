@@ -19,7 +19,7 @@ Given a sequence such as `(1, 2, 3)`, the values within that sequence or array c
 
 This proposal would allow this to be written more concisely as:
 
-    let ($x, $y, $z) := get-camera-point()
+    let $(x, y, z) := get-camera-point()
     return "(" || $x || "," || $y || "," || $z || ")"
 
 An XPath or XQuery processor may implement this by transforming it to the expanded form above with `$result` being a unique variable that is not visible to the expression.
@@ -40,7 +40,7 @@ This would apply to any variable declaration or binding where `:=` is used to as
 
 If the decomposition is being performed on an array, it may be better to use array syntax to define the composition:
 
-    let [$x, $y, $z] := get-camera-point()
+    let $[x, y, z] := get-camera-point()
     return "(" || $x || "," || $y || "," || $z || ")"
 
 The `(...)` syntax would then be *sequence decomposition*, while the `[...]` syntax would be *array decomposition*.
@@ -55,11 +55,12 @@ This does add an additional level of complexity to the language grammar, but may
 
 It can be useful to only extract part of a sequence or array (e.g. the heading of a table), and store the rest of the items in another variable. For example:
 
-    let ($heading as array(xs:string), $rows as array(xs:string)*) := load-csv("test.csv")
+    let $(heading as array(xs:string), rows as array(xs:string)...) :=
+        load-csv("test.csv")
 
 It may be useful to define a shorthand for selecting the rest of the sequence or array. Using the CSV example above:
 
-    let ($heading, $rows*) := load-csv("test.csv")
+    let $(heading, rows ...) := load-csv("test.csv")
 
 The other occurrence indicators would also be usable after the last variable binding.
 
@@ -91,7 +92,7 @@ Extracting values from a sequence:
     };
 
     let $angle := math:pi()
-    let ($sin, $cos) := sincos($angle)
+    let $(sin, cos) := sincos($angle)
     return $sin || "," || $cos
 
 Extracting values from an array:
@@ -101,12 +102,12 @@ Extracting values from an array:
     };
 
     let $angle := math:pi()
-    let ($sin, $cos) := sincos($angle)
+    let $[sin, cos] := sincos($angle)
     return $sin || "," || $cos
 
 Extracting values with typed variables:
 
-    let ($x as xs:double, $y as xs:double) := polar-to-cartesian(1.0, math:pi())
+    let $(x as xs:double, y as xs:double) := polar-to-cartesian(1.0, math:pi())
     return "x=" || $x || ", y=" || $y
 
 
@@ -118,4 +119,4 @@ TBD.
 ## Version History
 
 1.  Initial proposal.
-1.  Remove references to tuples, except for the influences section.
+1.  Remove references to tuples, except for the influences section. Update the syntax to use the suggested syntax from Michael Kay and Christian Grün.
