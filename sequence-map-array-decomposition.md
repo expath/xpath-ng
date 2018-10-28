@@ -1,4 +1,4 @@
-# Sequence and Array Decomposition
+# Sequence, Map, and Array Decomposition
 
 **Author**: Reece H. Dunn. 67 Bricks.
 
@@ -24,7 +24,7 @@ This proposal would allow this to be written more concisely as:
 
 These are equivalent in this proposal, except that `$result` is not a statically known variable binding in the sequence decomposition let clause.
 
-For each variable declaration in the sequence decomposition at index `N`, and `$expr` being the result of the for/let expression, then `$expr[N]` is the value bound to the variable declaration as a new variable binding. If the value does not exist, an empty sequence is returned.
+For each variable declaration in the sequence decomposition at index `N`, and `$expr` being the result of the for/let expression, then `$expr[N]` is the value bound to the variable declaration as a new variable binding. If the value does not exist, an empty sequence is bound to the variable.
 
 A sequence decomposition can be used in any for or let clause binding to decompose the items in a sequence. If the type of the for or let clause binding expression is not a sequence, an `err:XPTY0004` error is raised.
 
@@ -51,18 +51,42 @@ For each variable declaration in the array decomposition at index `N`, and `$exp
 An array decomposition can be used in any for or let clause binding to decompose the items in an array. If the type of the for or let clause binding expression is not a sequence, an `err:XPTY0004` error is raised.
 
 
-### Assigning the rest of a sequence or array
+### Map Decomposition
+
+Given a map such as `{x: 1, y: 2, z: 3}`, the values within that map cannot easily be extracted. With the current version of XPath and XQuery, they need to be assigned to a temporary variable first. For example:
+
+    let $result := get-camera-point()
+    let $x := $result?(x)
+    let $y := $result?(y)
+    let $z := $result?(z)
+    return "(" || $x || "," || $y || "," || $z || ")"
+
+This proposal would allow this to be written more concisely as:
+
+    let ${x, y, z} := get-camera-point()
+    return "(" || $x || "," || $y || "," || $z || ")"
+
+These are equivalent in this proposal, except that `$result` is not a statically known variable binding in the map decomposition let clause.
+
+For each variable declaration with EQName `var` in the map decomposition, and `$expr` being the result of the for/let expression, then `$expr?(var)` is the value bound to the variable declaration as a new variable binding. If the value does not exist, an empty sequence is bound to the variable.
+
+An array decomposition can be used in any for or let clause binding to decompose the items in an array. If the type of the for or let clause binding expression is not a sequence, an `err:XPTY0004` error is raised.
+
+
+### Assigning the rest of a sequence, map or array
 
 It can be useful to only extract part of a sequence or array (e.g. the heading of a table), and store the rest of the items in another variable. For example:
 
     let $(heading as array(xs:string), rows as array(xs:string)...) :=
         load-csv("test.csv")
 
-It may be useful to define a shorthand for selecting the rest of the sequence or array. Using the CSV example above:
+or without specifically declared types:
 
     let $(heading, rows ...) := load-csv("test.csv")
 
-The other occurrence indicators would also be usable after the last variable binding.
+For a map decomposition, the value of the last variable binding contains all entries in the map that have not been assigned to previous variable bindings in the map decomposition.
+
+If there are no items remaining in the sequence, map, or array, the result is an empty sequence, map, or array respectively.
 
 
 ### Influences
@@ -120,4 +144,4 @@ TBD.
 ## Version History
 
 1.  Initial proposal.
-1.  Remove references to tuples, except for the influences section. Update the syntax to use the suggested syntax from Michael Kay and Christian Grün.
+1.  Remove references to tuples, except for the influences section. Update the syntax to use the suggested syntax from Michael Kay and Christian Grün. Define syntax and rules for map decomposition, as suggested by Michael Kay.
