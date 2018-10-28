@@ -142,7 +142,7 @@ Extracting a single value from a map:
 
 ## Grammar
 
-__New Symbols__:
+__New Symbols (XPath and XQuery)__:
 
 	DecompositionVarNames         ::= SequenceDecompositionVarNames
 	                                | ArrayDecompositionVarNames
@@ -150,18 +150,26 @@ __New Symbols__:
 	SequenceDecompositionVarNames ::= "(" DecompositionVarNameList ")"
 	ArrayDecompositionVarNames    ::= "[" DecompositionVarNameList "]"
 	MapDecompositionVarNames      ::= "{" DecompositionVarNameList "}"
+
+__New Symbols (XPath)__:
+
 	DecompositionVarNameList      ::= VarName ("," VarName)* "..."?
+
+__New Symbols (XQuery)__:
+
+	DecompositionVarNameList      ::= VarName TypeDeclaration?
+	                                  ( "," VarName TypeDeclaration? )* "..."?
 
 __Modified Symbols (XPath)__:
 
-	SimpleForBinding ::= "$" (VarName | DecompositionVarNames) "in" ExprSingle
-	SimpleLetBinding ::= "$" (VarName | DecompositionVarNames) ":=" ExprSingle
+	SimpleForBinding ::= "$" ( VarName | DecompositionVarNames ) "in" ExprSingle
+	SimpleLetBinding ::= "$" ( VarName | DecompositionVarNames ) ":=" ExprSingle
 
 __Modified Symbols (XQuery)__:
 
-	ForBinding       ::= "$" (VarName | DecompositionVarNames) TypeDeclaration?
+	ForBinding       ::= "$" ( ( VarName TypeDeclaration? ) | DecompositionVarNames )
 	                     AllowingEmpty? PositionalVar? "in" ExprSingle
-	LetBinding       ::= "$" (VarName | DecompositionVarNames) TypeDeclaration?
+	LetBinding       ::= "$" ( ( VarName TypeDeclaration? ) | DecompositionVarNames )
 	                     ":=" ExprSingle
 
 
