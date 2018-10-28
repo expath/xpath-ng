@@ -4,7 +4,7 @@
 
 **Revision**: 2
 
-This proposal allows sequences and arrays to be decomposed and assigned to separate variables in a single declaration.
+This proposal allows sequences, maps, and arrays to be decomposed and assigned to separate variables in a single declaration.
 
 
 ## Sequence Decomposition
@@ -135,13 +135,37 @@ Extracting values with typed variables:
     let $(x as xs:double, y as xs:double) := polar-to-cartesian(1.0, math:pi())
     return "x=" || $x || ", y=" || $y
 
+Extracting a single value from a map:
+
+    for ${width} in get-items() ! get-area(.) return $width
+
 
 ## Grammar
 
-TBD.
+__New Symbols__:
+
+	DecompositionVarNames         ::= SequenceDecompositionVarNames
+	                                | ArrayDecompositionVarNames
+	                                | MapDecompositionVarNames
+	SequenceDecompositionVarNames ::= "(" DecompositionVarNameList ")"
+	ArrayDecompositionVarNames    ::= "[" DecompositionVarNameList "]"
+	MapDecompositionVarNames      ::= "{" DecompositionVarNameList "}"
+	DecompositionVarNameList      ::= VarName ("," VarName)* "..."?
+
+__Modified Symbols (XPath)__:
+
+	SimpleForBinding ::= "$" (VarName | DecompositionVarNames) "in" ExprSingle
+	SimpleLetBinding ::= "$" (VarName | DecompositionVarNames) ":=" ExprSingle
+
+__Modified Symbols (XQuery)__:
+
+	ForBinding       ::= "$" (VarName | DecompositionVarNames) TypeDeclaration?
+	                     AllowingEmpty? PositionalVar? "in" ExprSingle
+	LetBinding       ::= "$" (VarName | DecompositionVarNames) TypeDeclaration?
+	                     ":=" ExprSingle
 
 
 ## Version History
 
 1.  Initial proposal.
-1.  Remove references to tuples, except for the influences section. Update the syntax to use the suggested syntax from Michael Kay and Christian Grün. Define syntax and rules for map decomposition, as suggested by Michael Kay.
+1.  Remove references to tuples, except for the influences section. Update the syntax to use the suggested syntax from Michael Kay and Christian Grün. Define syntax and rules for map decomposition, as suggested by Michael Kay. Specify the grammar section.
