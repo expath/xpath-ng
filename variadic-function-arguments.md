@@ -19,9 +19,9 @@ variadic parameter is given a type, the elements in that array has that type.
 >
 > In this example, `$mimetypes` is a *variadic function parameter* with the type `array(xs:string)`.
 
-A function definition where the last parameter is a variadic function parameter has a minimum arity equal to the number of non-variadic parameters, and an unbounded maximum arity.
+The function arity is now a range instead of a scalar. That is, a function with `P` parameters has an arity of `[P..P]` if it is not variadic, and an arity of `[P-1..INF]` if it is variadic. This is an inclusive range. __NOTE:__ `P-1` is used here as a variadic function parameter matches 0 or more function arguments.
 
-A function reference to a variadic function will behave the same as if the function was defined with the specified arity, or an error if there are fewer arguments than the requested arity.
+A named function reference or argument list matches a function's arity if the number of arguments is within the arity range. If no function is located with the requested arity, an XPST0017 error is raised.
 
 If a named function reference is created with an arity equal to the number of parameters including the variadic function parameter, the type of the last parameter in the bound function is the variadic parameter type.
 
@@ -95,6 +95,11 @@ Using inline function expressions, untyped (XPath/XQuery):
         array:fold-left($values, 0, function ($a, $b) { $a + $b })
     };
     return $sum(1, 2, 3)
+
+### Interaction with ArrowFunctionSpecifier
+
+    1 => sum(2) (: adds '1' to the start of the variadic parameters :)
+    "%d" => out:format(2) (: passes "%d" to the only non-variadic parameter :)
 
 ### rest:form-params (EXQuery RESTXQ)
 
